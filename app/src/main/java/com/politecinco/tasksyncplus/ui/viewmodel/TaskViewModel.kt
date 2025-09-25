@@ -1,28 +1,53 @@
 package com.politecinco.tasksyncplus.ui.viewmodel
 
-import androidx.lifecycle.*
-import com.politecinco.tasksyncplus.data.model.Task
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.politecinco.tasksyncplus.data.repository.TaskRepository
+import com.politecinco.tasksyncplus.ui.fragments.TaskListFragment.TaskFilter
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
+//Mejoramietno de TaskViewModel.kt ya que se realizaron cambios en el TasklistFragment.kt
+//Hecho por: Juan Pacheco
 
-    val allTasks: LiveData<List<Task>> = repository.getAllTasks()
-    val pendingTasks: LiveData<List<Task>> = repository.getPendingTasks()
-    val completedTasks: LiveData<List<Task>> = repository.getCompletedTasks()
+@HiltViewModel /
+class TaskViewModel @Inject constructor(
+    private val repository: TaskRepository
+) : ViewModel() {
 
-    fun insertTask(task: Task) = viewModelScope.launch { repository.insertTask(task) }
-    fun updateTask(task: Task) = viewModelScope.launch { repository.updateTask(task) }
-    fun deleteTask(task: Task) = viewModelScope.launch { repository.deleteTask(task) }
-    fun toggleTaskCompletion(task: Task) = viewModelScope.launch { repository.toggleTaskCompletion(task) }
-}
+    private val _currentFilter = MutableStateFlow(TaskFilter.ALL)
+    val currentFilter: StateFlow<TaskFilter> = _currentFilter.asStateFlow()
 
-class TaskViewModelFactory(private val repository: TaskRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TaskViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return TaskViewModel(repository) as T
+    val allTasks = repository.getAllTasks()
+    val pendingTasks = repository.getPendingTasks()
+    val completedTasks = repository.getCompletedTasks()
+
+    fun setFilter(filter: TaskFilter) {
+        _currentFilter.value = filter
+    }
+
+    fun toggleTaskCompletion(taskId: Long) {
+        viewModelScope.launch {
+            repository.toggleTaskCompletion(taskId)
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+
+    fun deleteTask(taskId: Long) {
+        viewModelScope.launch {
+            repository.deleteTask(taskId)
+        }
+    }
+
+    companion object {
+        class Factory(private val repository: TaskRepository) : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return TaskViewModel(repository) as T
+            }
+        }
     }
 }
