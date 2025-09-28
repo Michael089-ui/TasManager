@@ -14,6 +14,8 @@ import com.politecinco.tasksyncplus.ui.adapters.TaskAdapter
 import com.politecinco.tasksyncplus.ui.viewmodel.TaskViewModel
 import com.politecinco.tasksyncplus.ui.viewmodel.TaskViewModelFactory
 import com.politecinco.tasksyncplus.data.model.Task
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 // Lista de tareas con filtros (ALL/PENDING/COMPLETED) usando MediatorLiveData.
 // Hecho por: Daniel Castrillon
@@ -60,53 +62,102 @@ class TaskListFragment : Fragment() {
         val factory = TaskViewModelFactory(repository)
         taskViewModel = ViewModelProvider(this, factory)[TaskViewModel::class.java]
     }
-
+//Mejoramietno de scroll-aware para FAB
+//Hecho por: Juan Pacheco
     private fun setupRecyclerView() {
-        taskAdapter = TaskAdapter { task ->
-            onTaskClicked(task)
-        }
+        taskAdapter = TaskAdapter(
+            onTaskClicked = { task ->
+                onTaskClicked(task)
+            },
+            onTaskLongClicked = { task ->
+                // Opcional: añadir funcionalidad de long click
+                true
+            }
+        )
+        
         binding.tasksRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = taskAdapter
+            // Mejora: añadir decoraciones o optimizaciones si es necesario
+            setHasFixedSize(true)
         }
     }
 
     private fun setupFab() {
         binding.fabAddTask.setOnClickListener {
-            // TODO: navigate to create task screen
+            navigateToCreateTask()
+        }
+        
+        // Opcional: añadir comportamiento scroll-aware al FAB
+        binding.tasksRecyclerView.addOnScrollListener(
+            object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (dy > 0 && binding.fabAddTask.isShown) {
+                        binding.fabAddTask.hide()
+                    } else if (dy < 0 && !binding.fabAddTask.isShown) {
+                        binding.fabAddTask.show()
+                    }
+                }
+            }
+        )
+    }
+
+    private fun observeTaskList() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Combina el filtro actual con la lista de tareas
+                combine(
+                    taskViewModel.allTasks,
+                    taskViewModel.currentFilter
+                ) { tasks, filter ->
+                    filterTasks(tasks, filter)
+                }.collect { filteredTasks ->
+                    taskAdapter.submitList(filteredTasks)
+                    handleEmptyState(filteredTasks.isEmpty())
+                }
+            }
         }
     }
 
-    // Cambia la fuente observada según el filtro
+    private fun filterTasks(tasks: List<Task>, filter: TaskFilter): List<Task> {
+        return when (filter) {
+            TaskFilter.ALL -> tasks
+            TaskFilter.PENDING -> tasks.filter { !it.isCompleted }
+            TaskFilter.COMPLETED -> tasks.filter { it.isCompleted }
+        }
+    }
+
+    private fun handleEmptyState(isEmpty: Boolean) {
+        binding.emptyStateView.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        binding.tasksRecyclerView.visibility = if (isEmpty) View.GONE else View.VISIBLE
+    }
+
+    // Cambia el filtro de manera más eficiente
     fun setFilter(filter: TaskFilter) {
-        if (!this::taskViewModel.isInitialized) return
-        if (filter == currentFilter && currentSource != null) return
+        if (filter == currentFilter) return
         currentFilter = filter
-
-        val newSource: LiveData<List<Task>> = when (filter) {
-            TaskFilter.ALL -> taskViewModel.allTasks
-            TaskFilter.PENDING -> taskViewModel.pendingTasks
-            TaskFilter.COMPLETED -> taskViewModel.completedTasks
-        }
-        switchSource(newSource)
-    }
-
-    private fun switchSource(newSource: LiveData<List<Task>>) {
-        currentSource?.let { src -> currentTasks.removeSource(src) }
-        currentSource = newSource
-        currentTasks.addSource(newSource) { list ->
-            currentTasks.value = list
-        }
+        taskViewModel.setFilter(filter)
     }
 
     private fun onTaskClicked(task: Task) {
-        // TODO: navigate to detail screen
+        navigateToTaskDetail(task.id)
+    }
+
+    private fun navigateToCreateTask() {
+        // TODO: Implementar navegación a creación de tarea
+        // findNavController().navigate(R.id.action_taskListFragment_to_createTaskFragment)
+    }
+
+    private fun navigateToTaskDetail(taskId: Long) {
+        // TODO: Implementar navegación a detalle de tarea
+        // findNavController().navigate(TaskListFragmentDirections.actionTaskListFragmentToTaskDetailFragment(taskId))
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // Limpiar listeners para evitar memory leaks
+        binding.tasksRecyclerView.clearOnScrollListeners()
         _binding = null
-        currentSource?.let { src -> currentTasks.removeSource(src) }
-        currentSource = null
     }
 }
