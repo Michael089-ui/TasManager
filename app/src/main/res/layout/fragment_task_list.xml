@@ -1,18 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Daniel Castrillon: Layout principal del fragmento de lista de tareas con panel de Quick Tasks -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingBottom="16dp">
 
+    <!-- Daniel Castrillon: Contenedor principal para el panel de tareas rápidas -->
+    <LinearLayout
+        android:id="@+id/quickTasksContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="vertical"
+        android:background="@drawable/background_quick_tasks_panel"
+        android:padding="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Daniel Castrillon: Botón para abrir diálogo de creación de tarea rápida -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddQuickTask"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Añadir tarea rápida"
+            android:textAllCaps="false"
+            app:icon="@android:drawable/ic_input_add"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp"
+            app:iconTint="@color/primary_blue"
+            android:textColor="@color/primary_blue"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Daniel Castrillon: Etiqueta del panel de tareas rápidas -->
+        <TextView
+            android:id="@+id/quickTasksLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tareas rápidas"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Daniel Castrillon: Mensaje de estado vacío cuando no hay tareas rápidas -->
+        <TextView
+            android:id="@+id/quickTasksEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pulsa &quot;Añadir tarea rápida&quot; para crear una nota temporal."
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:padding="12dp"
+            android:background="@drawable/background_empty_state"
+            android:visibility="gone" />
+
+        <!-- Daniel Castrillon: RecyclerView para mostrar las tareas rápidas -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/quickTasksRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+    <!-- Daniel Castrillon: RecyclerView principal para las tareas normales -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tasksRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/quickTasksContainer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Daniel Castrillon: FAB para agregar tareas normales (funcionalidad existente) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddTask"
         android:layout_width="wrap_content"
@@ -21,6 +91,6 @@
         app:srcCompat="@android:drawable/ic_input_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="16dp"/>
+        android:layout_margin="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

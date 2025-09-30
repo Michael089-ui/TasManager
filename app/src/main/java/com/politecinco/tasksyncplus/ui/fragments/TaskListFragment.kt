@@ -4,18 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+// Daniel Castrillon: Importaciones agregadas para la funcionalidad de Quick Tasks
+import com.politecinco.tasksyncplus.databinding.DialogQuickTaskBinding
 import com.politecinco.tasksyncplus.databinding.FragmentTaskListBinding
 import com.politecinco.tasksyncplus.data.database.TaskDatabase
 import com.politecinco.tasksyncplus.data.repository.TaskRepository
+import com.politecinco.tasksyncplus.ui.adapters.QuickTaskAdapter
 import com.politecinco.tasksyncplus.ui.adapters.TaskAdapter
 import com.politecinco.tasksyncplus.ui.viewmodel.TaskViewModel
-import com.politecinco.tasksyncplus.ui.viewmodel.TaskViewModelFactory
 import com.politecinco.tasksyncplus.data.model.Task
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
+import com.politecinco.tasksyncplus.ui.model.QuickTaskUiModel
+import kotlin.random.Random
 
 // Lista de tareas con filtros (ALL/PENDING/COMPLETED) usando MediatorLiveData.
 // Hecho por: Daniel Castrillon
@@ -28,11 +32,25 @@ class TaskListFragment : Fragment() {
 
     private lateinit var taskViewModel: TaskViewModel
     private lateinit var taskAdapter: TaskAdapter
+    // Daniel Castrillon: Adaptador agregado para manejar las tareas rápidas
+    private lateinit var quickTaskAdapter: QuickTaskAdapter
 
-    // LiveData mediador para cambiar la fuente según el filtro
-    private val currentTasks = MediatorLiveData<List<Task>>()
+    // Daniel Castrillon: Refactorización para gestionar manualmente la fuente LiveData sin usar Hilt o MediatorLiveData
     private var currentSource: LiveData<List<Task>>? = null
     private var currentFilter: TaskFilter = TaskFilter.ALL
+
+    // Daniel Castrillon: Lista mutable para almacenar las tareas rápidas en memoria
+    private val quickTasks = mutableListOf<QuickTaskUiModel>()
+
+    // Daniel Castrillon: Método helper para cambiar dinámicamente la fuente de LiveData y evitar observadores duplicados
+    private fun observeTasks(source: LiveData<List<Task>>) {
+        // Daniel Castrillon: Removemos observadores anteriores para evitar memory leaks
+        currentSource?.removeObservers(viewLifecycleOwner)
+        currentSource = source
+        currentSource?.observe(viewLifecycleOwner) { tasks ->
+            taskAdapter.submitList(tasks)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,12 +64,10 @@ class TaskListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViewModel()
+        // Daniel Castrillon: Configuración de la nueva sección de tareas rápidas
+        setupQuickTasksSection()
         setupRecyclerView()
         setupFab()
-        // Observa la lista actual (según filtro)
-        currentTasks.observe(viewLifecycleOwner) { tasks ->
-            taskAdapter.submitList(tasks)
-        }
         // Filtro por defecto: todas
         setFilter(TaskFilter.ALL)
     }
@@ -59,22 +75,40 @@ class TaskListFragment : Fragment() {
     private fun setupViewModel() {
         val database = TaskDatabase.getDatabase(requireContext())
         val repository = TaskRepository(database.taskDao())
-        val factory = TaskViewModelFactory(repository)
+        // Daniel Castrillon: Uso de Factory manual en lugar de inyección de dependencias con Hilt
+        val factory = TaskViewModel.Factory(repository)
         taskViewModel = ViewModelProvider(this, factory)[TaskViewModel::class.java]
     }
-//Mejoramietno de scroll-aware para FAB
-//Hecho por: Juan Pacheco
+
+    // Daniel Castrillon: Configuración completa de la sección de tareas rápidas
+    private fun setupQuickTasksSection() {
+        // Daniel Castrillon: Inicialización del adaptador con callback para toggle de completado
+        quickTaskAdapter = QuickTaskAdapter { task ->
+            toggleQuickTaskCompletion(task)
+        }
+
+        // Daniel Castrillon: Configuración del RecyclerView para tareas rápidas
+        binding.quickTasksRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = quickTaskAdapter
+            itemAnimator = null // Daniel Castrillon: Evitar parpadeos durante el toggle
+        }
+
+        // Daniel Castrillon: Configuración del botón para agregar nuevas tareas rápidas
+        binding.btnAddQuickTask.setOnClickListener {
+            showQuickTaskDialog()
+        }
+
+        // Daniel Castrillon: Actualizar visibilidad inicial de los elementos
+        updateQuickTasksVisibility()
+    }
+
     private fun setupRecyclerView() {
-        taskAdapter = TaskAdapter(
-            onTaskClicked = { task ->
-                onTaskClicked(task)
-            },
-            onTaskLongClicked = { task ->
-                // Opcional: añadir funcionalidad de long click
-                true
-            }
-        )
-        
+        // Daniel Castrillon: Simplificación del adaptador usando lambda en lugar de múltiples callbacks
+        taskAdapter = TaskAdapter { task ->
+            onTaskClicked(task)
+        }
+
         binding.tasksRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = taskAdapter
@@ -87,7 +121,7 @@ class TaskListFragment : Fragment() {
         binding.fabAddTask.setOnClickListener {
             navigateToCreateTask()
         }
-        
+
         // Opcional: añadir comportamiento scroll-aware al FAB
         binding.tasksRecyclerView.addOnScrollListener(
             object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
@@ -103,23 +137,6 @@ class TaskListFragment : Fragment() {
         )
     }
 
-    private fun observeTaskList() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Combina el filtro actual con la lista de tareas
-                combine(
-                    taskViewModel.allTasks,
-                    taskViewModel.currentFilter
-                ) { tasks, filter ->
-                    filterTasks(tasks, filter)
-                }.collect { filteredTasks ->
-                    taskAdapter.submitList(filteredTasks)
-                    handleEmptyState(filteredTasks.isEmpty())
-                }
-            }
-        }
-    }
-
     private fun filterTasks(tasks: List<Task>, filter: TaskFilter): List<Task> {
         return when (filter) {
             TaskFilter.ALL -> tasks
@@ -128,20 +145,88 @@ class TaskListFragment : Fragment() {
         }
     }
 
-    private fun handleEmptyState(isEmpty: Boolean) {
-        binding.emptyStateView.visibility = if (isEmpty) View.VISIBLE else View.GONE
-        binding.tasksRecyclerView.visibility = if (isEmpty) View.GONE else View.VISIBLE
-    }
-
     // Cambia el filtro de manera más eficiente
     fun setFilter(filter: TaskFilter) {
-        if (filter == currentFilter) return
+        if (filter == currentFilter && currentSource != null) return
         currentFilter = filter
         taskViewModel.setFilter(filter)
+
+        // Daniel Castrillon: Selección manual de la fuente LiveData según el filtro actual
+        val source = when (filter) {
+            TaskFilter.ALL -> taskViewModel.allTasks
+            TaskFilter.PENDING -> taskViewModel.pendingTasks
+            TaskFilter.COMPLETED -> taskViewModel.completedTasks
+        }
+        observeTasks(source)
     }
 
     private fun onTaskClicked(task: Task) {
         navigateToTaskDetail(task.id)
+    }
+
+    // Daniel Castrillon: Método para alternar el estado de completado de una tarea rápida
+    private fun toggleQuickTaskCompletion(task: QuickTaskUiModel) {
+        val index = quickTasks.indexOfFirst { it.id == task.id }
+        if (index == -1) return
+
+        // Daniel Castrillon: Crear copia inmutable con estado actualizado
+        val updatedTask = task.copy(isCompleted = !task.isCompleted)
+        quickTasks[index] = updatedTask
+        // Daniel Castrillon: Actualizar el adaptador con nueva lista inmutable
+        quickTaskAdapter.submitList(quickTasks.toList())
+    }
+
+    // Daniel Castrillon: Método para mostrar el diálogo de creación de tareas rápidas
+    private fun showQuickTaskDialog() {
+        val context = requireContext()
+        val dialogBinding = DialogQuickTaskBinding.inflate(layoutInflater)
+
+        AlertDialog.Builder(context)
+            .setTitle("Nueva tarea rápida")
+            .setView(dialogBinding.root)
+            .setPositiveButton("Crear") { dialog, _ ->
+                // Daniel Castrillon: Obtener y limpiar los datos del formulario
+                val title = dialogBinding.inputQuickTaskTitle.text?.toString()?.trim().orEmpty()
+                val description = dialogBinding.inputQuickTaskDescription.text?.toString()?.trim()
+
+                if (title.isNotEmpty()) {
+                    addQuickTask(title, description)
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancelar") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    // Daniel Castrillon: Método para agregar una nueva tarea rápida a la lista
+    private fun addQuickTask(title: String, description: String?) {
+        val newTask = QuickTaskUiModel(
+            // Daniel Castrillon: Generar ID único usando timestamp + random para evitar colisiones
+            id = System.currentTimeMillis() + Random.nextInt(0, 10_000),
+            title = title,
+            // Daniel Castrillon: Solo guardar descripción si no está vacía
+            description = description?.takeIf { it.isNotBlank() },
+            isCompleted = false
+        )
+        // Daniel Castrillon: Agregar al inicio de la lista para mostrar las más recientes primero
+        quickTasks.add(0, newTask)
+        quickTaskAdapter.submitList(quickTasks.toList())
+        updateQuickTasksVisibility()
+    }
+
+    // Daniel Castrillon: Método para controlar la visibilidad de elementos según el estado de las tareas rápidas
+    private fun updateQuickTasksVisibility() {
+        if (quickTasks.isEmpty()) {
+            // Daniel Castrillon: Mostrar mensaje de estado vacío cuando no hay tareas rápidas
+            binding.quickTasksEmptyState.visibility = View.VISIBLE
+            binding.quickTasksRecyclerView.visibility = View.GONE
+        } else {
+            // Daniel Castrillon: Mostrar lista cuando hay tareas rápidas disponibles
+            binding.quickTasksEmptyState.visibility = View.GONE
+            binding.quickTasksRecyclerView.visibility = View.VISIBLE
+        }
     }
 
     private fun navigateToCreateTask() {
