@@ -5,53 +5,55 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardUseCompatPadding="true"
-    app:cardCornerRadius="8dp"
-    app:cardBackgroundColor="@color/card_background">
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/white">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
 
-        <!-- Indicador de estado -->
+        <!-- Contenido de la tarea (título y descripción) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/taskTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Realizar mercado"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/taskDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Comprar huevos, leche, pan..."
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary" />
+
+        </LinearLayout>
+
+        <!-- Círculo de completado -->
         <ImageView
-            android:id="@+id/statusIndicator"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:contentDescription="status"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:src="@drawable/indicator_circle_blue" />
+            android:id="@+id/completionCircle"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/task_completion_circle"
+            android:contentDescription="Marcar como completado"
+            android:clickable="true"
+            android:focusable="true" />
 
-        <TextView
-            android:id="@+id/taskTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:textColor="@color/text_primary"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/statusIndicator"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="8dp"/>
+    </LinearLayout>
 
-        <TextView
-            android:id="@+id/taskDescription"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_secondary"
-            app:layout_constraintTop_toBottomOf="@id/taskTitle"
-            app:layout_constraintStart_toStartOf="@id/taskTitle"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <TextView
-            android:id="@+id/taskDueDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_secondary"
-            app:layout_constraintTop_toBottomOf="@id/taskDescription"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="8dp"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

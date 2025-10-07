@@ -7,6 +7,20 @@
     <fragment
         android:id="@+id/taskListFragment"
         android:name="com.politecinco.tasksyncplus.ui.fragments.TaskListFragment"
-        android:label="Task List" />
+        android:label="Task List">
+        <action
+            android:id="@+id/action_taskListFragment_to_taskDetailFragment"
+            app:destination="@id/taskDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/taskDetailFragment"
+        android:name="com.politecinco.tasksyncplus.ui.fragments.TaskDetailFragment"
+        android:label="Detalle de tarea">
+        <argument
+            android:name="taskId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </fragment>
 
 </navigation>

@@ -7,100 +7,191 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <!-- Título de la aplicación (se mantiene) -->
-    <TextView
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="?attr/actionBarSize"
         android:background="@color/primary_blue"
-        android:text="TaskSyncPlus"
-        android:gravity="center"
-        style="@style/HeaderText" />
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-    <!-- Navbar superior con tres secciones a TODO el ancho -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TaskSyncPlus"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Título Menu -->
     <LinearLayout
-        android:id="@+id/top_navbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:background="@color/primary_blue"
-        android:gravity="center_vertical">
+        android:layout_height="wrap_content"
+        android:background="@color/light_blue"
+        android:padding="16dp">
 
         <TextView
-            android:id="@+id/tab_menu"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="Menu"
-            android:gravity="center"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:maxLines="1"
-            android:ellipsize="end"
-            app:autoSizeTextType="uniform"
-            app:autoSizeMinTextSize="10sp"
-            app:autoSizeMaxTextSize="16sp"
-            app:autoSizeStepGranularity="1sp" />
-
-        <TextView
-            android:id="@+id/tab_pending"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="Tareas Pendientes"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:maxLines="1"
-            android:ellipsize="end"
-            app:autoSizeTextType="uniform"
-            app:autoSizeMinTextSize="10sp"
-            app:autoSizeMaxTextSize="16sp"
-            app:autoSizeStepGranularity="1sp" />
-
-        <TextView
-            android:id="@+id/tab_completed"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="Completadas"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:maxLines="1"
-            android:ellipsize="end"
-            app:autoSizeTextType="uniform"
-            app:autoSizeMinTextSize="10sp"
-            app:autoSizeMaxTextSize="16sp"
-            app:autoSizeStepGranularity="1sp" />
+            android:textColor="@color/text_primary"
+            android:gravity="start" />
 
     </LinearLayout>
 
-    <!-- Contenido principal con dos paneles -->
+    <!-- Contenido principal con sidebar y contenido -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@color/task_detail_background_pink">
 
-        <!-- Panel izquierdo: navegación (solo categorías) -->
-        <!-- Ajuste de ancho del sidebar para mejor legibilidad. Hecho por: Daniel Castrillon -->
-        <FrameLayout
-            android:id="@+id/nav_fragment_container"
-            android:layout_width="0dp"
+        <!-- Sidebar izquierdo -->
+        <LinearLayout
+            android:layout_width="160dp"
             android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:background="@color/background_gray" />
+            android:orientation="vertical"
+            android:background="@color/light_blue"
+            android:padding="16dp">
 
-        <!-- Panel derecho: contenido -->
+            <!-- Todas las tareas -->
+            <LinearLayout
+                android:id="@+id/btn_all_tasks"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/selected_menu_item"
+                android:padding="8dp"
+                android:layout_marginBottom="8dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/menu_icon_background_blue"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_agenda"
+                        android:tint="@color/white" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Todas las tareas"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:background="#00000000" />
+
+            </LinearLayout>
+
+            <!-- Pendientes -->
+            <LinearLayout
+                android:id="@+id/btn_pending_tasks"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/selector_menu_item"
+                android:padding="8dp"
+                android:layout_marginBottom="8dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/menu_icon_background_gray"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_today"
+                        android:tint="@color/text_primary" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Pendientes"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:gravity="center"
+                    android:background="#00000000" />
+
+            </LinearLayout>
+
+            <!-- Completados -->
+            <LinearLayout
+                android:id="@+id/btn_completed_tasks"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/selector_menu_item"
+                android:padding="8dp"
+                android:layout_marginBottom="8dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/menu_icon_background_gray"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_check"
+                        android:tint="@color/text_primary" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Completados"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:gravity="center"
+                    android:background="#00000000" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Contenido principal de las tareas -->
         <FrameLayout
             android:id="@+id/content_fragment_container"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="3"
-            android:background="@color/card_background" />
+            android:layout_weight="1"
+            android:background="@color/task_detail_background_pink"
+            android:padding="16dp" />
 
     </LinearLayout>
 

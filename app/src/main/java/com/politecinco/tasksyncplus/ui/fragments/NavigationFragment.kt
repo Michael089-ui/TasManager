@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
-import com.politecinco.tasksyncplus.R
+import com.politecinco.tasksyncplus.MainActivity
 import com.politecinco.tasksyncplus.databinding.FragmentNavigationBinding
+import com.politecinco.tasksyncplus.ui.model.TaskFilter
 
 /**
- * Fragmento del sidebar (solo categorías). Reenvía clicks a la Activity para filtrar.
+ * Fragmento del sidebar (solo categorías). Reenvía clicks al ViewModel compartido para filtrar.
  */
 // Sidebar de categorías; reenvía clics para filtrar lista.
 // Hecho por: Daniel Castrillon
@@ -25,19 +25,16 @@ class NavigationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentNavigationBinding.inflate(inflater, container, false)
-
-        val taskListFragment = requireActivity()
-            .supportFragmentManager
-            .findFragmentById(R.id.content_fragment_container) as? TaskListFragment
+        val sharedViewModel = (requireActivity() as MainActivity).sharedViewModel
 
         binding.btnAllTasks.setOnClickListener {
-            taskListFragment?.setFilter(TaskListFragment.TaskFilter.ALL)
+            sharedViewModel.setFilter(TaskFilter.ALL)
         }
         binding.btnPendingTasks.setOnClickListener {
-            taskListFragment?.setFilter(TaskListFragment.TaskFilter.PENDING)
+            sharedViewModel.setFilter(TaskFilter.PENDING)
         }
         binding.btnCompletedTasks.setOnClickListener {
-            taskListFragment?.setFilter(TaskListFragment.TaskFilter.COMPLETED)
+            sharedViewModel.setFilter(TaskFilter.COMPLETED)
         }
 
         return binding.root
@@ -47,5 +44,4 @@ class NavigationFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }

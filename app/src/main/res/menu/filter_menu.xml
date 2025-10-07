@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/filter_all"
+        android:title="Todas las tareas"
+        android:icon="@drawable/ic_agenda" />
+    
+    <item
+        android:id="@+id/filter_pending"
+        android:title="Tareas pendientes"
+        android:icon="@drawable/ic_today" />
+    
+    <item
+        android:id="@+id/filter_completed"
+        android:title="Tareas completadas"
+        android:icon="@drawable/ic_check" />
+</menu>

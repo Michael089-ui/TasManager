@@ -1,4 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TaskSyncPlus</string>
+
+    <!-- Task form strings -->
+    <string name="dialog_title_create_task">Nueva tarea</string>
+    <string name="dialog_title_edit_task">Editar tarea</string>
+    <string name="dialog_positive_save">Guardar</string>
+    <string name="dialog_negative_cancel">Cancelar</string>
+    <string name="task_detail_header">Detalle de tarea</string>
+    <string name="task_detail_subtitle">Actualiza la información de tu tarea</string>
+    <string name="task_detail_label_title">Título</string>
+    <string name="task_detail_hint_title">Título de la tarea</string>
+    <string name="task_detail_label_description">Descripción</string>
+    <string name="task_detail_hint_description">Descripción de la tarea</string>
+    <string name="task_detail_label_due_date">Fecha de vencimiento</string>
+    <string name="task_detail_hint_due_date">Selecciona fecha y hora</string>
+    <string name="task_detail_label_notes">Anotaciones</string>
+    <string name="task_detail_hint_notes">Añade anotaciones o instrucciones</string>
+    <string name="task_detail_label_attachment">Archivo adjunto</string>
+    <string name="task_detail_attachment_empty">Sin archivo</string>
+    <string name="task_detail_attachment_select">Seleccionar imagen</string>
+    <string name="task_detail_label_voice_note">Grabar nota de voz</string>
+    <string name="task_detail_voice_note_initial">00:00</string>
+    <string name="task_detail_button_cancel">Cancelar</string>
+    <string name="task_detail_button_save">Guardar cambios</string>
+    <string name="task_detail_button_calendar">Exportar al calendario</string>
+    <string name="task_detail_action_attachment">Seleccionar imagen</string>
+    <string name="task_detail_voice_note_content_description">Grabar nota de voz</string>
+    <string name="task_detail_attachment_content_description">Adjuntar imagen</string>
+    <string name="task_detail_message_saved">Tarea actualizada correctamente.</string>
+    <string name="task_detail_message_cancelled">Cambios descartados.</string>
+    <string name="task_detail_message_missing_title">El título es obligatorio.</string>
+    <string name="task_detail_message_missing_due_date">Selecciona fecha y hora de vencimiento.</string>
+    <string name="task_detail_message_recording_start">Grabando nota de voz…</string>
+    <string name="task_detail_message_recording_stop">Nota de voz guardada.</string>
+    <string name="task_detail_message_recording_error">No se pudo grabar la nota de voz.</string>
+    <string name="task_detail_message_audio_playing">Reproduciendo nota de voz…</string>
+    <string name="task_detail_message_audio_stopped">Reproducción detenida.</string>
+    <string name="task_detail_message_audio_missing">No hay nota de voz disponible.</string>
+    <string name="task_detail_calendar_title">Nuevo evento</string>
+    <string name="task_detail_calendar_description">Actividad programada desde TaskSyncPlus</string>
+    <string name="task_detail_permission_required_audio">Se requiere permiso de audio para grabar notas de voz.</string>
+    <string name="task_detail_permission_required_storage">Se requiere permiso para acceder a archivos.</string>
+    <string name="task_detail_error_loading">No se pudo cargar la tarea.</string>
+    <string name="task_form_error_title_required">El título es obligatorio.</string>
+    <string name="task_form_error_due_date_required">Selecciona una fecha de vencimiento.</string>
+    <string name="task_creation_success">Tarea creada correctamente.</string>
+    <string name="task_update_success">Tarea actualizada.</string>
+    <string name="task_creation_error">No se pudo crear la tarea.</string>
+    <string name="date_picker_title">Selecciona una fecha</string>
+    
+    <!-- TaskDetailFragment strings -->
+    <string name="task_detail_header_new">Nueva tarea</string>
+    <string name="task_detail_header_edit">Editar tarea</string>
+    <string name="attachment_added_success">Archivo adjunto agregado</string>
+    <string name="attachment_error">Error al adjuntar archivo</string>
+    <string name="voice_note_recording">Grabando...</string>
+    <string name="voice_note_playing">Reproduciendo...</string>
+    <string name="voice_note_ready">Listo para reproducir</string>
+    <string name="voice_note_record_error">Error al grabar nota de voz</string>
+    <string name="voice_note_play_error">Error al reproducir nota de voz</string>
+    <string name="voice_note_saved_success">Nota de voz guardada</string>
+    <string name="calendar_export_error">Error al exportar al calendario</string>
+    <string name="error_title">Error</string>
+    <string name="task_not_found_error">No se pudo encontrar la tarea</string>
+    <string name="dialog_positive_ok">OK</string>
+    <string name="audio_permission_denied">Se requiere permiso de audio para grabar notas de voz</string>
 </resources>

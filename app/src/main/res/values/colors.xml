@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary_blue">#5B9BD5</color>
+    <color name="primary_blue_light">#7FAFDD</color>
     <color name="light_blue">#E8F1F9</color>
     <color name="task_pending_blue">#4A90E2</color>
     <color name="task_completed_orange">#FF8C00</color>
@@ -12,4 +13,14 @@
     <color name="text_secondary">#666666</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="task_detail_header_blue">#A1B9FF</color>
+    <color name="task_detail_background_pink">#FFF1F5</color>
+    <color name="task_detail_card_background">#FFFFFF</color>
+    <color name="task_detail_accent">#FF8FA3</color>
+    <color name="task_detail_accent_dark">#FF6B88</color>
+    
+    <!-- Colores para el sidebar -->
+    <color name="warning_orange">#FF8C00</color>
+    <color name="success_green">#4CAF50</color>
+    <color name="divider_color">#E0E0E0</color>
 </resources>
