@@ -16,7 +16,9 @@ import com.politecinco.tasksyncplus.ui.model.QuickTaskUiModel
  */
 class QuickTaskAdapter(
     // Daniel Castrillon: Callback para manejar el toggle de completado de tareas
-    private val onToggleCompletion: (QuickTaskUiModel) -> Unit
+    private val onToggleCompletion: (QuickTaskUiModel) -> Unit,
+    // Daniel Castrillon: Callback para manejar el click en la tarea completa
+    private val onTaskClicked: (QuickTaskUiModel) -> Unit
 ) : ListAdapter<QuickTaskUiModel, QuickTaskAdapter.QuickTaskViewHolder>(QuickTaskDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuickTaskViewHolder {
@@ -24,7 +26,7 @@ class QuickTaskAdapter(
         val binding = ItemQuickTaskBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
-        return QuickTaskViewHolder(binding, onToggleCompletion)
+        return QuickTaskViewHolder(binding, onToggleCompletion, onTaskClicked)
     }
 
     override fun onBindViewHolder(holder: QuickTaskViewHolder, position: Int) {
@@ -34,7 +36,8 @@ class QuickTaskAdapter(
 
     class QuickTaskViewHolder(
         private val binding: ItemQuickTaskBinding,
-        private val onToggleCompletion: (QuickTaskUiModel) -> Unit
+        private val onToggleCompletion: (QuickTaskUiModel) -> Unit,
+        private val onTaskClicked: (QuickTaskUiModel) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         // Daniel Castrillon: Método para vincular datos de la tarea rápida con la vista
@@ -61,6 +64,11 @@ class QuickTaskAdapter(
             // Daniel Castrillon: Configurar click listener para toggle de completado
             binding.quickTaskStatusIndicator.setOnClickListener {
                 onToggleCompletion(task)
+            }
+            
+            // Daniel Castrillon: Configurar click listener para navegar al detalle de la tarea
+            binding.root.setOnClickListener {
+                onTaskClicked(task)
             }
         }
     }

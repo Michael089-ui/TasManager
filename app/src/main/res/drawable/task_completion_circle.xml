@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Estado completado - círculo con check -->
+    <item android:state_selected="true">
+        <layer-list>
+            <!-- Círculo de fondo azul -->
+            <item>
+                <shape android:shape="oval">
+                    <solid android:color="@color/primary_blue" />
+                    <size android:width="32dp" android:height="32dp" />
+                </shape>
+            </item>
+            <!-- Icono de check blanco -->
+            <item android:drawable="@drawable/ic_check_white" 
+                  android:gravity="center" />
+        </layer-list>
+    </item>
+    
+    <!-- Estado pendiente - círculo vacío con borde azul -->
+    <item>
+        <shape android:shape="oval">
+            <stroke 
+                android:width="2dp" 
+                android:color="@color/primary_blue" />
+            <solid android:color="@android:color/transparent" />
+            <size android:width="32dp" android:height="32dp" />
+        </shape>
+    </item>
+</selector>

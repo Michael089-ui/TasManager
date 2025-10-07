@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.kapt")
+    id("androidx.navigation.safeargs.kotlin") version "2.8.3"
 }
 
 android {
@@ -42,11 +43,6 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.15"
-    }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
     }
 }
 

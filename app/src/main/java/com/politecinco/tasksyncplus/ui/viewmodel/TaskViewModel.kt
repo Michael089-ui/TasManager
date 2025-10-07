@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.politecinco.tasksyncplus.data.repository.TaskRepository
 import com.politecinco.tasksyncplus.data.model.Task
-import com.politecinco.tasksyncplus.ui.fragments.TaskListFragment.TaskFilter
+import com.politecinco.tasksyncplus.ui.model.TaskFilter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
